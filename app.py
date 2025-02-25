@@ -72,14 +72,14 @@ if uploaded_file or img_file:
     with col1:
         st.subheader("🟢 Green Bin (Biodegradable)")
         if predicted_class == "Biodegradable":
-            st.image(image, caption="Moved to Green Bin", use_column_width=True)
+            st.image(image, caption="Moved to Green Bin", use_container_width=True)
 
     with col2:
         st.subheader("🔴 Red Bin (Non-Biodegradable)")
         if predicted_class == "Non-Biodegradable":
-            st.image(image, caption="Moved to Red Bin", use_column_width=True)
+            st.image(image, caption="Moved to Red Bin", use_container_width=True)
 
     with col3:
         st.subheader("🟠 Orange Bin (Hazardous)")
         if predicted_class == "Hazardous":
-            st.image(image, caption="Moved to Orange Bin", use_column_width=True)
+            st.image(image, caption="Moved to Orange Bin", use_container_width=True)
