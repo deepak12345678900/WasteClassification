@@ -6,8 +6,12 @@ from PIL import Image
 import time
 
 # Define waste categories and bins
-class_names = ["Biodegradable", "Hazardous" ,"Non-Biodegradable"]
-bin_colors = {"Biodegradable": "🟢 Green Bin","Hazardous": "🟠 Orange Bin", "Non-Biodegradable": "🔴 Red Bin"}
+class_names = ["Biodegradable", "Hazardous", "Non-Biodegradable"]
+bin_colors = {
+    "Biodegradable": "🟢 Green Bin",
+    "Hazardous": "🟠 Orange Bin",
+    "Non-Biodegradable": "🔴 Red Bin"
+}
 
 # Load trained EfficientNet model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -27,27 +31,33 @@ transform = transforms.Compose([
 
 # Streamlit UI
 st.title("♻️ Waste Classification & Sorting System")
-st.write("Upload an image, and the system will classify it and move it into the correct bin.")
+st.write("Upload an image or take a picture to classify and sort waste into the correct bin.")
 
-# Upload waste image
+# File Upload & Camera Input
 uploaded_file = st.file_uploader("Upload a waste image...", type=["jpg", "png", "jpeg"])
+img_file = st.camera_input("Or take a picture")
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-
-    # Preprocess and classify
+# Function to predict waste category
+def predict_waste(image):
     image_tensor = transform(image).unsqueeze(0).to(device)
-
     with torch.no_grad():
         output = model(image_tensor)
         predicted_class_idx = torch.argmax(output, 1).item()
+    return class_names[predicted_class_idx]
 
-    predicted_class = class_names[predicted_class_idx]
+# Process Image
+if uploaded_file or img_file:
+    image_source = uploaded_file if uploaded_file else img_file
+    image = Image.open(image_source)
+
+    # Predict Class
+    predicted_class = predict_waste(image)
     bin_color = bin_colors[predicted_class]
 
-    # Simulate moving waste to the correct bin
-    st.write("Classifying waste...")
-    time.sleep(1)  # Delay for effect
+    # Display classification results
+    st.write("🔍 **Classifying waste...**")
+    time.sleep(1)  # Simulating processing delay
+    st.success(f"✅ Waste classified as **{predicted_class}** and moved into the {bin_color}.")
 
     # Display bins
     col1, col2, col3 = st.columns(3)
@@ -55,16 +65,14 @@ if uploaded_file is not None:
     with col1:
         st.subheader("🟢 Green Bin (Biodegradable)")
         if predicted_class == "Biodegradable":
-            st.image(image, caption="Moved to Green Bin", use_container_width=True)
+            st.image(image, caption="Moved to Green Bin", use_column_width=True)
 
     with col2:
         st.subheader("🔴 Red Bin (Non-Biodegradable)")
         if predicted_class == "Non-Biodegradable":
-            st.image(image, caption="Moved to Red Bin", use_container_width=True)
+            st.image(image, caption="Moved to Red Bin", use_column_width=True)
 
     with col3:
         st.subheader("🟠 Orange Bin (Hazardous)")
         if predicted_class == "Hazardous":
-            st.image(image, caption="Moved to Orange Bin", use_container_width=True)
-
-    st.success(f"✅ Waste classified as **{predicted_class}** and moved into the {bin_color}.")
+            st.image(image, caption="Moved to Orange Bin", use_column_width=True)
