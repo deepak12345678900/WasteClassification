@@ -33,9 +33,16 @@ transform = transforms.Compose([
 st.title("♻️ Waste Classification & Sorting System")
 st.write("Upload an image or take a picture to classify and sort waste into the correct bin.")
 
-# File Upload & Camera Input
+# File Upload
 uploaded_file = st.file_uploader("Upload a waste image...", type=["jpg", "png", "jpeg"])
-img_file = st.camera_input("Or take a picture")
+
+# Button to activate camera
+use_camera = st.button("Use Camera")
+
+if use_camera:
+    img_file = st.camera_input("Take a picture")
+else:
+    img_file = None  # Camera won't activate automatically
 
 # Function to predict waste category
 def predict_waste(image):
